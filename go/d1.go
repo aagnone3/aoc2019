@@ -1,13 +1,9 @@
 package main
 
 import (
-	"bufio"
-	"io"
 	"log"
 	"math"
-	"os"
 	"strconv"
-	"strings"
 )
 
 func fuelFromMass(mass int) int {
@@ -29,61 +25,43 @@ func fuelFromFuel(fuelMass int) int {
 }
 
 func part1(fn string) int {
-	fuelNeeded := 0
+	numLines := countNumLines(fn)
+	out := make([]int, numLines)
 
-	file, err := os.Open(fn)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer file.Close()
-
-	reader := bufio.NewReader(file)
-	line := ""
-	mass := 0
-	for {
-		line, err = reader.ReadString('\n')
-		if err == io.EOF {
-			break
-		}
+	process := func(i int, line string) {
+		mass, err := strconv.Atoi(line)
 		if err != nil {
 			log.Fatal(err)
 		}
+		out[i] = fuelFromMass(int(mass))
+	}
+	readFileLines(fn, numLines, process)
 
-		mass, err = strconv.Atoi(strings.TrimSpace(line))
-		fuelNeeded += fuelFromMass(int(mass))
+	fuelNeeded := 0
+	for _, num := range out {
+		fuelNeeded += num
 	}
 	log.Printf("[1] fuel needed: %d\n", fuelNeeded)
 	return fuelNeeded
 }
 
 func part2(fn string) int {
-	fuelNeeded := 0
+	numLines := countNumLines(fn)
+	out := make([]int, numLines)
 
-	file, err := os.Open(fn)
-	if err != nil {
-		log.Fatal(err)
+	process := func(i int, line string) {
+		mass, err := strconv.Atoi(line)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fuel := fuelFromMass(int(mass))
+		out[i] = fuel + fuelFromFuel(fuel)
 	}
-	defer file.Close()
+	readFileLines(fn, numLines, process)
 
-	reader := bufio.NewReader(file)
-	line := ""
-	mass := 0
-	fuel := 0
-	for {
-		line, err = reader.ReadString('\n')
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		mass, err = strconv.Atoi(strings.TrimSpace(line))
-		if err != nil {
-			log.Fatal(err)
-		}
-		fuel = fuelFromMass(mass)
-		fuelNeeded += fuel + fuelFromFuel(fuel)
+	fuelNeeded := 0
+	for _, num := range out {
+		fuelNeeded += num
 	}
 	log.Printf("[2] fuel needed: %d\n", fuelNeeded)
 	return fuelNeeded
