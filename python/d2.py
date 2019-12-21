@@ -2,29 +2,7 @@ from __future__ import print_function
 from copy import deepcopy
 
 from util import log
-
-
-class Intcode(object):
-
-    OPCODES = {
-        1: '+',
-        2: '-'
-    }
-
-    def __init__(self, command):
-        self.opcode, self.idx1, self.idx2, self.idx_dst = command
-        if self.opcode not in self.OPCODES:
-            raise ValueError('Bad opcode')
-
-    def forward(self, codes):
-        if self.opcode == 1:
-            codes[self.idx_dst] = codes[self.idx1] + codes[self.idx2]
-        elif self.opcode == 2:
-            codes[self.idx_dst] = codes[self.idx1] * codes[self.idx2]
-        return codes
-
-    def __str__(self):
-        return "codes[%d] = codes[%d] %s codes[%d]" % (self.idx_dst, self.idx1, self.OPCODES[self.opcode], self.idx2)
+from intcode import make_intcode
 
 
 def part2(codes, target=19690720):
@@ -51,9 +29,9 @@ def forward(codes, noun=None, verb=None):
         elif opcode not in [1, 2]:
             raise ValueError("Unexpected opcode %d at position %d." % (opcode, index))
 
-        cmd = Intcode(codes[index:index + 4])
+        cmd = make_intcode(codes[index:index + 4])
         commands.append(cmd)
-        codes = cmd.forward(codes)
+        codes = cmd(codes)
         index += 4
 
     return codes, commands
@@ -72,15 +50,15 @@ def test_forward():
 
 
 if __name__ == '__main__':
-    # test_forward()
-    fn = "../res/d2.txt"
-    with open(fn) as fp:
-        codes = list(map(int, fp.read().strip().split(',')))
+    test_forward()
+    # fn = "../res/d2.txt"
+    # with open(fn) as fp:
+    #     codes = list(map(int, fp.read().strip().split(',')))
 
     # codes, commands = forward(codes, 12, 2)
     # print(codes[0])
 
-    noun, verb = part2(codes)
-    print(noun, verb)
-    print(100 * noun + verb)
+    # noun, verb = part2(codes)
+    # print(noun, verb)
+    # print(100 * noun + verb)
     # 86, 9 => 8609
